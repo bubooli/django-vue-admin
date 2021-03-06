@@ -8,7 +8,6 @@ from simple_history.models import HistoricalRecords
 from django.contrib.postgres.fields import JSONField
 
 
-
 class Position(BaseModel):
     """
     职位/岗位
@@ -39,7 +38,7 @@ class Permission(SoftModel):
     is_frame = models.BooleanField('外部链接', default=False)
     sort = models.IntegerField('排序标记', default=1)
     parent = models.ForeignKey('self', null=True, blank=True,
-                            on_delete=models.SET_NULL, verbose_name='父')
+                               on_delete=models.SET_NULL, verbose_name='父')
     method = models.CharField('方法/代号', max_length=50,
                               unique=True, null=True, blank=True)
 
@@ -64,7 +63,7 @@ class Organization(SoftModel):
     type = models.CharField('类型', max_length=20,
                             choices=organization_type_choices, default='部门')
     parent = models.ForeignKey('self', null=True, blank=True,
-                            on_delete=models.SET_NULL, verbose_name='父')
+                               on_delete=models.SET_NULL, verbose_name='父')
 
     class Meta:
         verbose_name = '组织架构'
@@ -90,8 +89,7 @@ class Role(SoftModel):
     perms = models.ManyToManyField(Permission, blank=True, verbose_name='功能权限')
     datas = models.CharField('数据权限', max_length=50,
                              choices=data_type_choices, default='本级及以下')
-    depts = models.ManyToManyField(
-        Organization, blank=True, verbose_name='权限范围')
+    depts = models.ManyToManyField(Organization, blank=True, verbose_name='权限范围')  # 给部门级角色赋权
     description = models.CharField('描述', max_length=50, blank=True, null=True)
 
     class Meta:
@@ -126,6 +124,7 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
+
 class DictType(SoftModel):
     """
     数据字典类型
@@ -133,7 +132,7 @@ class DictType(SoftModel):
     name = models.CharField('名称', max_length=30)
     code = models.CharField('代号', unique=True, max_length=30)
     parent = models.ForeignKey('self', null=True, blank=True,
-                            on_delete=models.SET_NULL, verbose_name='父')
+                               on_delete=models.SET_NULL, verbose_name='父')
 
     class Meta:
         verbose_name = '字典类型'
@@ -155,7 +154,7 @@ class Dict(SoftModel):
         DictType, on_delete=models.CASCADE, verbose_name='类型')
     sort = models.IntegerField('排序', default=1)
     parent = models.ForeignKey('self', null=True, blank=True,
-                            on_delete=models.SET_NULL, verbose_name='父')
+                               on_delete=models.SET_NULL, verbose_name='父')
     is_used = models.BooleanField('是否有效', default=True)
     history = HistoricalRecords()
 
@@ -167,28 +166,33 @@ class Dict(SoftModel):
     def __str__(self):
         return self.name
 
+
 class CommonAModel(SoftModel):
     """
     业务用基本表A,包含create_by, update_by字段
     """
     create_by = models.ForeignKey(
-        User, null=True, blank=True, on_delete=models.SET_NULL, verbose_name='创建人', related_name= '%(class)s_create_by')
+        User, null=True, blank=True, on_delete=models.SET_NULL, verbose_name='创建人', related_name='%(class)s_create_by')
     update_by = models.ForeignKey(
-        User, null=True, blank=True, on_delete=models.SET_NULL, verbose_name='最后编辑人', related_name= '%(class)s_update_by')
+        User, null=True, blank=True, on_delete=models.SET_NULL, verbose_name='最后编辑人',
+        related_name='%(class)s_update_by')
 
     class Meta:
         abstract = True
+
 
 class CommonBModel(SoftModel):
     """
     业务用基本表B,包含create_by, update_by, belong_dept字段
     """
     create_by = models.ForeignKey(
-        User, null=True, blank=True, on_delete=models.SET_NULL, verbose_name='创建人', related_name = '%(class)s_create_by')
+        User, null=True, blank=True, on_delete=models.SET_NULL, verbose_name='创建人', related_name='%(class)s_create_by')
     update_by = models.ForeignKey(
-        User, null=True, blank=True, on_delete=models.SET_NULL, verbose_name='最后编辑人', related_name = '%(class)s_update_by')
+        User, null=True, blank=True, on_delete=models.SET_NULL, verbose_name='最后编辑人',
+        related_name='%(class)s_update_by')
     belong_dept = models.ForeignKey(
-        Organization, null=True, blank=True, on_delete=models.SET_NULL, verbose_name='所属部门', related_name= '%(class)s_belong_dept')
+        Organization, null=True, blank=True, on_delete=models.SET_NULL, verbose_name='所属部门',
+        related_name='%(class)s_belong_dept')
 
     class Meta:
         abstract = True

@@ -4,6 +4,7 @@ from utils.queryset import get_child_queryset2
 from .models import Permission
 from django.db.models import Q
 
+
 def get_permission_list(user):
     """
     获取权限列表,可用redis存取
@@ -18,6 +19,7 @@ def get_permission_list(user):
                 perms = perms | i.perms.all()
         perms_list = perms.values_list('method', flat=True)
         perms_list = list(set(perms_list))
+    # 存储user数据到redis缓存中
     cache.set(user.username + '__perms', perms_list)
     # cache.persist(user.username)
     return perms_list
@@ -36,7 +38,7 @@ class RbacPermission(BasePermission):
         :return:
         """
         if not request.user:
-            perms = ['visitor'] # 如果没有经过认证,视为游客
+            perms = ['visitor']  # 如果没有经过认证,视为游客
         else:
             perms = cache.get(request.user.username + '__perms')
         if not perms:
@@ -47,17 +49,20 @@ class RbacPermission(BasePermission):
             elif not hasattr(view, 'perms_map'):
                 return True
             else:
+                # 获取传入视图的权限列表
                 perms_map = view.perms_map
+                # 识别请求方法
                 _method = request._request.method.lower()
+                print(f'当前用户{request.user}的权限--->', perms)
                 if perms_map:
                     for key in perms_map:
-                        if key == _method or key == '*':
+                        if key == _method:
                             if perms_map[key] in perms or perms_map[key] == '*':
                                 return True
                 return False
         else:
             return False
-    
+
     def has_object_permission(self, request, view, obj):
         """
         Return `True` if permission is granted, `False` otherwise.
@@ -67,6 +72,7 @@ class RbacPermission(BasePermission):
         if hasattr(obj, 'belong_dept'):
             has_obj_perm(request.user, obj)
         return True
+
 
 def has_obj_perm(user, obj):
     """

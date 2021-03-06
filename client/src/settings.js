@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: '管理系统',
+  title: 'COPS运维管理系统',
 
   /**
    * @type {boolean} true | false

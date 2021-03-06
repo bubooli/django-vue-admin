@@ -63,6 +63,7 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
 
+
 class SoftModel(BaseModel):
     """
     软删除基本表

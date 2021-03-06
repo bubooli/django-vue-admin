@@ -4,6 +4,7 @@ from django.dispatch import receiver
 from django.core.cache import cache
 from .permission import get_permission_list
 
+
 # 变更用户角色时动态更新权限或者前端刷新
 @receiver(m2m_changed, sender=User.roles.through)
 def update_perms_cache_user(sender, instance, action, **kwargs):

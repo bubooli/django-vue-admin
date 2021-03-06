@@ -30,9 +30,9 @@ router.register('file', FileViewSet, basename="file")
 
 schema_view = get_schema_view(
    openapi.Info(
-      title="Django-Vue-Admin API",
+      title="Vue-Admin API",
       default_version='v1',
-      contact=openapi.Contact(email="caoqianming@foxmail.com"),
+      contact=openapi.Contact(email="aiops@foxmail.com"),
       license=openapi.License(name="MIT License"),
    ),
    public=True,
